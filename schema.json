@@ -134,7 +134,7 @@
       "searchAnalyzer": null,
       "analyzer": null,
       "normalizer": null,
-      "dimensions": 1536,
+      "dimensions": 3072,
       "vectorSearchProfile": "vector-profile",
       "synonymMaps": []
     }

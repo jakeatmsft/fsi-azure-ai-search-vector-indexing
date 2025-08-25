@@ -1,40 +1,73 @@
-# Azure AI Search - Python Based Content Vectorization and Enrichment
+# Azure AI Search — Python-based content vectorization and enrichment
 
-The goal of thie repo is to enable a code based approach for Chunking, Enriching and Vectorizing content into an Azure AI Search Index. It is meant to be easily extensible so that you can try different approaches of preparing your content for the purposes of doing Chat over your Data.
+This tutorial project provides a code-first workflow to chunk, enrich, and vectorize content, then index it into Azure AI Search. It’s designed to be simple to extend so you can try different content preparation approaches for chat over your data.
 
-## Required Azure Services
-This sample uses:
+## Azure services used
 - Azure AI Search
 - Azure OpenAI
 - Azure Document Intelligence
 - Azure Blob Storage
 
-## Required Changes
-- **config.json.sample**: You will need to update this config file with the details for your Azure services and rename this file to config.json.
-- **schema.json**: This file is used to create an Index that leverages integrated vectorization. For this reason you will need to set this to use your Azure OpenAI Embeddings endpoint by updating:
-          "resourceUri": "https://[OPENAI_SERVICE].openai.azure.com",
-          "deploymentId": "[OPENAI deploymentId]",
-          "apiKey": "[OPENAI API KEY]",
+## Prerequisites and setup
+1) Install Python dependencies:
+   - python -m pip install -r requirements.txt
 
-Ensure you install required packages:
-```
-pip install -r requirements.txt
-```
+2) Configure environment variables:
+   - Copy .env_sample to .env and fill in your values.
+   - The notebooks read environment variables (via python-dotenv). Common variables include:
+     - SEARCH_SERVICE_NAME, SEARCH_ADMIN_KEY, SEARCH_INDEX_NAME, SEARCH_INDEX_SCHEMA_FILE, SEARCH_API_VERSION
+     - OPENAI_API_BASE, OPENAI_API_KEY, OPENAI_API_VERSION, OPENAI_EMBEDDING_MODEL, OPENAI_GPT_MODEL
+     - BLOB_SERVICE_NAME, BLOB_CONTAINER, BLOB_KEY
+     - DOC_INTELLIGENCE_ENDPOINT, DOC_INTELLIGENCE_APIM_KEY
+     - MODEL_DEPLOYMENT_NAME, PROJECT_ENDPOINT (for the agent notebook)
 
-This notebook has only been tested on Linux. If you have files other than PDF, you will need to install converters as follows:
-```
-sudo apt-get update
-sudo apt-get install wkhtmltopdf
-sudo apt-get install libreoffice
-```
+3) Update the index schema (schema.json):
+   - If you’re using integrated vectorization, set your Azure OpenAI details in the vectorizer section:
+     - resourceUri: https://[OPENAI_SERVICE].openai.azure.com
+     - deploymentId: [your-embeddings-deployment]
+     - apiKey: [your-azure-openai-key]
 
-## Notebooks:
-1) [Create an Azure AI Search Index](https://github.com/liamca/azure-ai-search-vector-indexing/blob/main/01-create-index.ipynb) - This can be modified using the schema.json file in the event you want to change langugage analyzers, add additional fields for filtering and personalization of content or to add support for document access control
-2) [Process Content](https://github.com/liamca/azure-ai-search-vector-indexing/blob/main/02-process-content.ipynb) -- This will take content stored in an Azure Blob Storage account and process it. It does all the chunking and vectorization of content for most common file types. This can be extended in the event you wish to add additional file types. It currently used Azure Document Intelligence for the processing of the file, but that could be changed if needed. All of the processed content is then stored in a set of JSON files which makes doing BCDR or Geo-replication much simpler
-3) [Index Content](https://github.com/liamca/azure-ai-search-vector-indexing/blob/main/03-index-data.ipynb) - This will take the content stored in the JSON files from the previous step and index them into Azure AI Search. You may wish to rather upload the JSON files to a separate Blob container and use the Azure AI Search indexer.
-4) [Test Queries](https://github.com/liamca/azure-ai-search-vector-indexing/blob/main/04-test-query.ipynb) - Notebook for executing search queries (Vector, Hybrid and Semantic) directly against Azure AI Search. This is useful for doing validation of different approaches.
+Linux notes: If you need to process file types other than PDF, install converters:
+- sudo apt-get update
+- sudo apt-get install wkhtmltopdf
+- sudo apt-get install libreoffice
 
-## Future Goals
-1) Create a set of Azure Functions that will be triggered automatically when new content is added or changed in Azure Blob to do processing and indexing
-2) Add different approaches including support for chunking of content using GPT4
+## Quickstart
+1) Create the index
+   - Open 01-create-index.ipynb and run all cells.
+   - Confirms the index is created in your Azure AI Search service.
 
+2) Process documents
+   - Upload your source files to the configured Blob container.
+   - Open 02-process-content.ipynb and run all cells.
+   - Outputs JSON files to the data/ folder.
+
+3) Index the processed data
+   - Open 03-index-data.ipynb and run all cells.
+   - Confirms documents are added to your index.
+
+4) Test queries
+   - Open 04-test-query.ipynb and run the sample vector, hybrid, and semantic queries.
+
+5) Try the agent
+   - Open 05-ai-agent-search.ipynb, ensure MODEL_DEPLOYMENT_NAME and PROJECT_ENDPOINT are set, and run the notebook.
+
+## Notebooks (run in this order)
+1) 01-create-index.ipynb — Create an Azure AI Search index using schema.json, enabling vector search and integrated vectorization where configured.
+   Link: ./01-create-index.ipynb
+
+2) 02-process-content.ipynb — Ingest documents from Azure Blob Storage, extract content with Azure Document Intelligence, chunk, and embed using Azure OpenAI. Outputs JSON files under data/ for indexing.
+   Link: ./02-process-content.ipynb
+
+3) 03-index-data.ipynb — Load the processed JSON files and index them into Azure AI Search. Optionally, you can upload the JSON to Blob and use an Azure AI Search indexer instead.
+   Link: ./03-index-data.ipynb
+
+4) 04-test-query.ipynb — Run vector, hybrid, and semantic queries directly against your index to validate scoring and relevance.
+   Link: ./04-test-query.ipynb
+
+5) 05-ai-agent-search.ipynb — Use an Azure AI Project (agents) to call Azure AI Search as a tool and generate answers grounded in your index.
+   Link: ./05-ai-agent-search.ipynb
+
+## Future goals
+1) Create Azure Functions to automatically process and index new or updated content in Blob Storage
+2) Experiment with different chunking strategies (including GPT-based approaches)
