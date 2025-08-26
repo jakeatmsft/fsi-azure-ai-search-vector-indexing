@@ -200,6 +200,7 @@
         "azureOpenAIParameters": {
           "resourceUri": "https://[OPENAI_SERVICE].openai.azure.com",
           "deploymentId": "[OPENAI deploymentId]",
+          "modelName": "[OPENAI deploymentId]",
           "apiKey": "[OPENAI API KEY]",
           "authIdentity": null
         },
