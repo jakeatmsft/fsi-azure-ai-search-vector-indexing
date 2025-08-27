@@ -37,10 +37,14 @@ Linux notes: If you need to process file types other than PDF, install converter
    - Open 01-create-index.ipynb and run all cells.
    - Confirms the index is created in your Azure AI Search service.
 
-2) Process documents
-   - Upload your source files to the configured Blob container.
-   - Open 02-process-content.ipynb and run all cells.
-   - Outputs JSON files to the data/ folder.
+2) Process documents (two options)
+   - Option A (indexer + skillset, no local JSON):
+     - Open 02a-process-content-ai-skillset.ipynb and run all cells.
+     - This creates a data source, a skillset using Document Intelligence + Azure OpenAI embeddings, and an indexer that projects per-page chunks into the index. Ensure your index was created from schema.json, and your env vars (AOAI, Blob, Search, Cognitive Services key) are set.
+   - Option B (local processing):
+     - Upload your source files to the configured Blob container.
+     - Open 02-process-content.ipynb and run all cells.
+     - Outputs JSON files to the data/ folder for step 3.
 
 3) Index the processed data
    - Open 03-index-data.ipynb and run all cells.
